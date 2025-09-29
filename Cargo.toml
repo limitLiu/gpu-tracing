@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.97"
-bytemuck = "1.23.0"
+anyhow = "1"
+bytemuck = "1.23"
 pollster = { version = "0.4.0", features = ["macro"] }
-wgpu = "25.0.0"
+wgpu = "26"
 winit = "0.29"

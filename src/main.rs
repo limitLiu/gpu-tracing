@@ -18,7 +18,8 @@ async fn main() -> Result<()> {
     .with_title("GPU Path Tracer")
     .build(&event_loop)?;
   let (device, queue, surface) = connect_to_gpu(&window).await?;
-  let renderer = render::PathTracer::new(device, queue, WIDTH, HEIGHT);
+  let physical_size = window.inner_size();
+  let renderer = render::PathTracer::new(device, queue, physical_size.width, physical_size.height);
 
   event_loop.run(|event, control_handle| {
     control_handle.set_control_flow(ControlFlow::Poll);
@@ -44,7 +45,9 @@ async fn main() -> Result<()> {
   Ok(())
 }
 
-async fn connect_to_gpu(window: &Window) -> Result<(wgpu::Device, wgpu::Queue, wgpu::Surface)> {
+async fn connect_to_gpu(
+  window: &'_ Window,
+) -> Result<(wgpu::Device, wgpu::Queue, wgpu::Surface<'_>)> {
   use wgpu::TextureFormat::{Bgra8Unorm, Rgba8Unorm};
 
   let instance = wgpu::Instance::default();

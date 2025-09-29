@@ -28,7 +28,7 @@ impl PathTracer {
     let uniform_buffer = device.create_buffer(&wgpu::BufferDescriptor {
       label: Some("uniforms"),
       size: std::mem::size_of::<Uniforms>() as u64,
-      usage: wgpu::BufferUsages::UNIFORM,
+      usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
       mapped_at_creation: true,
     });
     uniform_buffer
@@ -71,6 +71,7 @@ impl PathTracer {
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
         view: target,
         resolve_target: None,
+        depth_slice: None,
         ops: wgpu::Operations {
           load: wgpu::LoadOp::Clear(wgpu::Color::BLACK),
           store: wgpu::StoreOp::Store,
