@@ -18,10 +18,19 @@ pub struct PathTracer {
 }
 
 impl PathTracer {
-  pub fn new(device: Device, queue: Queue, width: u32, height: u32) -> PathTracer {
-    device.on_uncaptured_error(Box::new(|e| panic!("Aborting due to an error: {e}")));
+  pub fn new(
+    device: Device,
+    queue: Queue,
+    width: u32,
+    height: u32,
+    format: wgpu::TextureFormat,
+  ) -> PathTracer {
+    device.on_uncaptured_error(std::sync::Arc::new(|e| {
+      panic!("Aborting due to an error: {e}")
+    }));
     let shader_module = compile_shader_module(&device);
-    let (display_pipeline, display_layout) = create_display_pipeline(&device, &shader_module);
+    let (display_pipeline, display_layout) =
+      create_display_pipeline(&device, &shader_module, format);
 
     let uniforms = Uniforms { width, height };
 
@@ -100,6 +109,7 @@ fn compile_shader_module(device: &Device) -> wgpu::ShaderModule {
 fn create_display_pipeline(
   device: &wgpu::Device,
   shader_module: &wgpu::ShaderModule,
+  format: wgpu::TextureFormat,
 ) -> (wgpu::RenderPipeline, wgpu::BindGroupLayout) {
   let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
     label: None,
@@ -141,7 +151,7 @@ fn create_display_pipeline(
       module: shader_module,
       entry_point: Some("display_fs"),
       targets: &[Some(wgpu::ColorTargetState {
-        format: wgpu::TextureFormat::Bgra8Unorm,
+        format,
         blend: None,
         write_mask: wgpu::ColorWrites::ALL,
       })],
